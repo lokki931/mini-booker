@@ -1,7 +1,5 @@
-"use client";
-import { createAuthClient } from "better-auth/client";
-import { passkeyClient } from "better-auth/client/plugins";
-
+import { createAuthClient } from "better-auth/react";
 export const client = createAuthClient({
-  plugins: [passkeyClient()],
+  /** The base URL of the server (optional if you're using the same domain) */
+  baseURL: process.env.BETTER_AUTH_URL!,
 });
