@@ -35,13 +35,14 @@ const formSchema = z.object({
     .min(1, { message: "This field has to be filled." })
     .email("This is not a valid email."),
   password: z.string().min(6, {
-    message: "password must be at least 6 characters.",
+    message: "Password must be at least 6 characters.",
   }),
 });
 
 export function LoginView() {
   const router = useRouter();
-  const [errorServer, setErrorSever] = useState<string | undefined>("");
+  const [errorServer, setErrorServer] = useState<string | undefined>("");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,19 +50,21 @@ export function LoginView() {
       password: "",
     },
   });
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { data, error } = await client.signIn.email({
       email: values.email,
       password: values.password,
       callbackURL: "/dashboard",
     });
+
     if (error) {
-      setErrorSever(error.message);
-    }
-    if (data) {
+      setErrorServer(error.message);
+    } else if (data) {
       router.push("/dashboard");
     }
   }
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -98,13 +101,15 @@ export function LoginView() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Email" {...field} />
+                    <Input type="password" placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Sign In</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Signing in..." : "Sign In"}
+            </Button>
           </form>
         </Form>
       </CardContent>

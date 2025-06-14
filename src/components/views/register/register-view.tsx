@@ -39,23 +39,21 @@ const formSchema = z
       message: "Name must be at least 2 characters.",
     }),
     password: z.string().min(6, {
-      message: "password must be at least 6 characters.",
+      message: "Password must be at least 6 characters.",
     }),
-    confirmPassword: z.string().min(4),
+    confirmPassword: z.string().min(6, {
+      message: "Please confirm your password.",
+    }),
   })
-  .refine(
-    (values) => {
-      return values.password === values.confirmPassword;
-    },
-    {
-      message: "Passwords must match!",
-      path: ["confirmPassword"],
-    }
-  );
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords must match!",
+    path: ["confirmPassword"],
+  });
 
 export function RegisterView() {
   const router = useRouter();
-  const [errorServer, setErrorSever] = useState<string | undefined>("");
+  const [errorServer, setErrorServer] = useState<string | undefined>("");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,6 +63,7 @@ export function RegisterView() {
       confirmPassword: "",
     },
   });
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { data, error } = await client.signUp.email({
       email: values.email,
@@ -72,19 +71,20 @@ export function RegisterView() {
       name: values.name,
       callbackURL: "/dashboard",
     });
+
     if (error) {
-      setErrorSever(error.message);
-    }
-    if (data) {
+      setErrorServer(error.message);
+    } else if (data) {
       router.push("/dashboard");
     }
   }
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>Register to your first account</CardTitle>
         <CardDescription>
-          Enter your email,name,password below to register to your first account
+          Enter your name, email, and password to create your account
         </CardDescription>
         <CardAction>
           <Link href="/login">
@@ -128,7 +128,7 @@ export function RegisterView() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Email" {...field} />
+                    <Input type="password" placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,7 +151,9 @@ export function RegisterView() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Sign Up</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Creating..." : "Sign Up"}
+            </Button>
           </form>
         </Form>
       </CardContent>
