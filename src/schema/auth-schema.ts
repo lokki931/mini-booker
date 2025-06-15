@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  pgEnum,
+  varchar,
+} from "drizzle-orm/pg-core";
+
+export const userRole = pgEnum("user_role", ["admin", "staff"]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -6,6 +15,7 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
+  role: userRole("role").notNull().default("staff"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
@@ -39,4 +49,36 @@ export const account = pgTable("account", {
   password: text("password"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+});
+
+export const businesses = pgTable("businesses", {
+  id: text("id").primaryKey(),
+  ownerId: text("owner_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 256 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Записи бронювань
+export const bookings = pgTable("bookings", {
+  id: text("id").primaryKey(),
+  businessId: text("business_id")
+    .notNull()
+    .references(() => businesses.id, { onDelete: "cascade" }),
+  staffId: text("staff_id").references(() => user.id), // хто виконує послугу
+  clientName: varchar("client_name", { length: 256 }).notNull(),
+  clientPhone: varchar("client_phone", { length: 50 }).notNull(),
+  service: varchar("service", { length: 256 }).notNull(),
+  bookingDate: timestamp("booking_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export const staffMembers = pgTable("staff_members", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .references(() => user.id)
+    .notNull(),
+  businessId: text("business_id")
+    .references(() => businesses.id)
+    .notNull(),
 });
