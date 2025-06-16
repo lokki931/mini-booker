@@ -16,6 +16,7 @@ export const user = pgTable("user", {
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
   role: userRole("role").notNull().default("staff"),
+  activeBusinessId: text("active_business_id"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
@@ -65,6 +66,7 @@ export const businesses = pgTable("businesses", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 256 }).notNull(),
+  plan: varchar("plan", { length: 256 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

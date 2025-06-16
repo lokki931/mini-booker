@@ -27,6 +27,12 @@ export const auth = betterAuth({
         required: false,
         defaultValue: "staff",
       },
+      activeBusinessId: {
+        type: "string",
+        input: true,
+        required: false,
+        defaultValue: "",
+      },
     },
   },
   callbacks: {
@@ -38,6 +44,7 @@ export const auth = betterAuth({
       user: ExtendedUser;
     }) {
       session.user.role = user.role;
+      session.user.activeBusinessId = user.activeBusinessId;
       return session;
     },
   },
