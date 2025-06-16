@@ -64,6 +64,14 @@ export function LoginView() {
       router.push("/dashboard");
     }
   }
+  const signIn = async () => {
+    const data = await client.signIn.social({
+      provider: "google",
+    });
+    if (data) {
+      console.log("done");
+    }
+  };
 
   return (
     <Card className="w-full max-w-sm">
@@ -107,15 +115,27 @@ export function LoginView() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
               {form.formState.isSubmitting ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter>
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          onClick={signIn}
+        >
+          Google
+        </Button>
         {errorServer && (
-          <p className="w-full text-red-600 flex items-center gap-x-2 p-2 border border-red-600">
+          <p className="mt-2 w-full text-red-600 flex items-center gap-x-2 p-2 border border-red-600">
             <CircleX />
             {errorServer}
           </p>
