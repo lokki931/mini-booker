@@ -26,12 +26,15 @@
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.44.2",
     "lucide-react": "^0.515.0",
+    "nanoid": "^5.1.5",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.57.0",
     "tailwind-merge": "^3.3.1",
-    "zod": "^3.25.64"
+    "vaul": "^1.1.2",
+    "zod": "^3.25.64",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

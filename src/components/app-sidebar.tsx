@@ -2,23 +2,13 @@
 
 import * as React from "react";
 import {
-  BarChartIcon,
-  CameraIcon,
   ClipboardListIcon,
   DatabaseIcon,
-  FileCodeIcon,
-  FileIcon,
-  FileTextIcon,
-  FolderIcon,
-  HelpCircleIcon,
   LayoutDashboardIcon,
-  ListIcon,
-  SearchIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
 
-import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
@@ -29,98 +19,43 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { BussinessSwitcher } from "./bussiness-switcher";
+import { useBusinessStore } from "@/stores/business";
+import { client } from "@/lib/auth-client";
+import { ExtendedSession } from "@/lib/types";
 
 const data = {
-  bussiness: [
-    {
-      id: "qq1",
-      name: "Acme Inc",
-      plan: "Enterprise",
-    },
-    {
-      id: "qq2",
-      name: "Acme Corp.",
-      plan: "Startup",
-    },
-    {
-      id: "qq3",
-      name: "Evil Corp.",
-      plan: "Free",
-    },
-  ],
-  navMain: [
+  navMainAdmin: [
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: ListIcon,
+      title: "Bookings",
+      url: "/dashboard/bookings",
+      icon: DatabaseIcon,
     },
     {
-      title: "Analytics",
-      url: "#",
-      icon: BarChartIcon,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: FolderIcon,
+      title: "Business",
+      url: "/dashboard/business",
+      icon: ClipboardListIcon,
     },
     {
       title: "Team",
-      url: "#",
+      url: "/dashboard/team",
       icon: UsersIcon,
     },
   ],
-  navClouds: [
+  navMainStaff: [
     {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboardIcon,
     },
     {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Bookings",
+      url: "/dashboard/bookings",
+      icon: DatabaseIcon,
     },
   ],
   navSecondary: [
@@ -129,45 +64,34 @@ const data = {
       url: "#",
       icon: SettingsIcon,
     },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: DatabaseIcon,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: ClipboardListIcon,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: FileIcon,
-    },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { businesses, setBusinesses } = useBusinessStore();
+  const { data: session } = client.useSession() as {
+    data: ExtendedSession | null;
+  };
+
+  const navLinks =
+    session?.user?.role === "admin" ? data.navMainAdmin : data.navMainStaff;
+
+  React.useEffect(() => {
+    fetch("/api/business")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.businesses) {
+          setBusinesses(data.businesses);
+        }
+      });
+  }, [setBusinesses]);
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <BussinessSwitcher bussiness={data.bussiness} />
+        <BussinessSwitcher bussiness={businesses || []} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        <NavMain items={navLinks} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
