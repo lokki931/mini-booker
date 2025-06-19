@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { useAddBusinessStore } from "@/stores/add-business";
@@ -7,8 +7,18 @@ import { useBusinessStore } from "@/stores/business";
 import { RemoveBusinessButton } from "./RemoveBusinessButton";
 
 export const BusinessView = () => {
-  const { businesses } = useBusinessStore();
+  const { businesses, setBusinesses } = useBusinessStore();
   const openDrawer = useAddBusinessStore((s) => s.open);
+
+  React.useEffect(() => {
+    fetch("/api/business")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.businesses) {
+          setBusinesses(data.businesses);
+        }
+      });
+  }, [setBusinesses]);
 
   return (
     <>

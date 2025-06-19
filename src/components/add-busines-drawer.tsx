@@ -106,22 +106,16 @@ export function AddBusinessDrawer() {
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting ? "Adding..." : "Add"}
-              </Button>
+              <DrawerFooter className="px-0 pt-0 pb-7">
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? "Adding..." : "Add"}
+                </Button>
+                <DrawerClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
             </form>
           </Form>
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button variant="outline" className="w-full">
-                Cancel
-              </Button>
-            </DrawerClose>
-          </DrawerFooter>
         </div>
       </DrawerContent>
     </Drawer>

@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/site-header";
+import { BookingsView } from "@/components/views/dashboard/bookings/bookings-view";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -11,21 +11,7 @@ const Page = async () => {
   if (!session) {
     return redirect("/dashboard");
   }
-  return (
-    <>
-      {session.user.role !== "admin" ? (
-        <>
-          <SiteHeader title="Bookings staff" />
-          <div className="flex flex-1 flex-col p-4">Bookings staff</div>
-        </>
-      ) : (
-        <>
-          <SiteHeader title="Bookings admin" />
-          <div className="flex flex-1 flex-col p-4">Bookings admin</div>
-        </>
-      )}
-    </>
-  );
+  return <BookingsView />;
 };
 
 export default Page;

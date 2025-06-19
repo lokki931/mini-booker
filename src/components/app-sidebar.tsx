@@ -22,6 +22,7 @@ import { BussinessSwitcher } from "./bussiness-switcher";
 import { useBusinessStore } from "@/stores/business";
 import { client } from "@/lib/auth-client";
 import { ExtendedSession } from "@/lib/types";
+import { AddBookingsDrawer } from "./add-bookings-drawer";
 
 const data = {
   navMainAdmin: [
@@ -86,17 +87,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       });
   }, [setBusinesses]);
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <BussinessSwitcher bussiness={businesses || []} />
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={navLinks} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser />
-      </SidebarFooter>
-    </Sidebar>
+    <>
+      <Sidebar collapsible="offcanvas" {...props}>
+        <SidebarHeader>
+          <BussinessSwitcher bussiness={businesses || []} />
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain items={navLinks} />
+          <NavSecondary items={data.navSecondary} className="mt-auto" />
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser />
+        </SidebarFooter>
+      </Sidebar>
+      <AddBookingsDrawer />
+    </>
   );
 }
