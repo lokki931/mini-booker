@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/site-header";
+import { BusinessView } from "@/components/views/dashboard/business/business-view";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -11,12 +11,7 @@ const Page = async () => {
   if (!session || session.user.role !== "admin") {
     return redirect("/dashboard");
   }
-  return (
-    <>
-      <SiteHeader title="Business" />
-      <div className="flex flex-1 flex-col p-4">Business</div>
-    </>
-  );
+  return <BusinessView />;
 };
 
 export default Page;

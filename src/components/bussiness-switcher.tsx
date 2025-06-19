@@ -48,7 +48,6 @@ export function BussinessSwitcher({ bussiness }: { bussiness: Business[] }) {
       console.error("Invalid response from API");
     }
   }
-  console.log(activeBusinessId);
 
   React.useEffect(() => {
     if (!session || !bussiness.length) return;
