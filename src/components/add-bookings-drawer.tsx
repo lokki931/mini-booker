@@ -33,19 +33,11 @@ import {
 import { useAddBookingsStore } from "@/stores/add-bookings";
 import { useBookingsStore } from "@/stores/bookings";
 import { useBusinessStore } from "@/stores/business";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { client } from "@/lib/auth-client";
 import { ExtendedSession } from "@/lib/types";
 import { usePathname, useRouter } from "next/navigation";
+import { DatePickerNew } from "./ui/date-picker-new";
+import { useStaffStore } from "@/stores/staff";
 
 const formSchema = z.object({
   clientName: z.string().min(2),
@@ -63,15 +55,15 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function AddBookingsDrawer() {
-  const pathname = usePathname();
   const router = useRouter();
+  const pathName = usePathname();
   const { data: session } = client.useSession() as {
     data: ExtendedSession | null;
   };
   const { isOpen, close } = useAddBookingsStore();
   const { bookings, setBookings } = useBookingsStore();
   const { activeBusinessId } = useBusinessStore();
-  const [staff, setStaff] = React.useState<{ id: string; name: string }[]>([]);
+  const { staff, fetchStaff, setStaff } = useStaffStore();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -84,19 +76,12 @@ export function AddBookingsDrawer() {
     },
   });
   React.useEffect(() => {
-    if (!activeBusinessId) return;
-    if (
-      session?.user.role !== "admin" &&
-      session?.user.id &&
-      session?.user.name
-    ) {
+    if (activeBusinessId && session?.user.role === "admin") {
+      fetchStaff(activeBusinessId);
+    } else if (session?.user) {
       setStaff([{ id: session.user.id, name: session.user.name }]);
-    } else {
-      fetch(`/api/business/staff?businessId=${activeBusinessId}`)
-        .then((res) => res.json())
-        .then(setStaff);
     }
-  }, [activeBusinessId]);
+  }, [activeBusinessId, fetchStaff, session, setStaff]);
 
   const onSubmit = async (values: FormData) => {
     const {
@@ -127,7 +112,7 @@ export function AddBookingsDrawer() {
     });
     const data = await res.json();
     if (res.ok) {
-      if (pathname !== "/dashboard/bookings") {
+      if (pathName !== "/dashboard/bookings") {
         router.push("/dashboard/bookings");
       }
       setBookings([...(bookings ?? []), data.newBookings]);
@@ -137,6 +122,10 @@ export function AddBookingsDrawer() {
       console.error("Failed to add booking");
     }
   };
+  function invateLink() {
+    router.push("/dashboard/team");
+    close();
+  }
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && close()}>
@@ -155,32 +144,10 @@ export function AddBookingsDrawer() {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Booking Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Select date</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <DatePickerNew
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -260,6 +227,14 @@ export function AddBookingsDrawer() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {session?.user.role === "admin" && (
+                      <span>
+                        no user -{" "}
+                        <Button onClick={invateLink} variant="secondary">
+                          invite
+                        </Button>
+                      </span>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { useBusinessStore } from "@/stores/business";
+import { useStaffStore } from "@/stores/staff";
 
 type TeamMember = {
   id: string;
@@ -13,6 +14,7 @@ type TeamMember = {
 
 export const TeamView = ({ userActiveId }: { userActiveId: string | null }) => {
   const { activeBusinessId } = useBusinessStore();
+  const { fetchStaff } = useStaffStore();
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [effectiveBusinessId, setEffectiveBusinessId] = useState<string | null>(
     null
@@ -43,6 +45,7 @@ export const TeamView = ({ userActiveId }: { userActiveId: string | null }) => {
     if (effectiveBusinessId) {
       const updatedUsers = await fetchUsersForBusiness(effectiveBusinessId);
       setUsers(updatedUsers);
+      await fetchStaff(effectiveBusinessId);
     }
     setLoadingId(null);
   }

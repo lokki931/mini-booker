@@ -7,18 +7,8 @@ import { useBusinessStore } from "@/stores/business";
 import { RemoveBusinessButton } from "./RemoveBusinessButton";
 
 export const BusinessView = () => {
-  const { businesses, setBusinesses } = useBusinessStore();
+  const { businesses } = useBusinessStore();
   const openDrawer = useAddBusinessStore((s) => s.open);
-
-  React.useEffect(() => {
-    fetch("/api/business")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.businesses) {
-          setBusinesses(data.businesses);
-        }
-      });
-  }, [setBusinesses]);
 
   return (
     <>
