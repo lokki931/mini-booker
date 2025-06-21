@@ -5,6 +5,8 @@ import {
   boolean,
   pgEnum,
   varchar,
+  time,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const userRole = pgEnum("user_role", ["admin", "staff"]);
@@ -76,7 +78,7 @@ export const bookings = pgTable("bookings", {
   businessId: text("business_id")
     .notNull()
     .references(() => businesses.id, { onDelete: "cascade" }),
-  staffId: text("staff_id").references(() => user.id), // хто виконує послугу
+  staffId: text("staff_id").references(() => user.id),
   clientName: varchar("client_name", { length: 256 }).notNull(),
   clientPhone: varchar("client_phone", { length: 50 }).notNull(),
   service: varchar("service", { length: 256 }).notNull(),
@@ -85,10 +87,13 @@ export const bookings = pgTable("bookings", {
 });
 export const staffMembers = pgTable("staff_members", {
   id: text("id").primaryKey(),
-  userId: text("user_id")
-    .references(() => user.id)
-    .notNull(),
   businessId: text("business_id")
-    .references(() => businesses.id)
-    .notNull(),
+    .notNull()
+    .references(() => businesses.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id),
+  workStart: time("work_start"),
+  workEnd: time("work_end"),
+  workDays: jsonb("work_days"),
 });

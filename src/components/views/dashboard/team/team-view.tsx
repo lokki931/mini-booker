@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { useBusinessStore } from "@/stores/business";
 import { useStaffStore } from "@/stores/staff";
+import { AddToBusinessDrawer } from "./add-user-to-business";
 
 type TeamMember = {
   id: string;
@@ -19,6 +20,8 @@ export const TeamView = ({ userActiveId }: { userActiveId: string | null }) => {
   const [effectiveBusinessId, setEffectiveBusinessId] = useState<string | null>(
     null
   );
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [users, setUsers] = useState<TeamMember[] | []>([]);
   async function fetchUsersForBusiness(businessId: string) {
     const res = await fetch(`/api/business/team?businessId=${businessId}`);
@@ -31,23 +34,10 @@ export const TeamView = ({ userActiveId }: { userActiveId: string | null }) => {
     return users;
   }
 
-  async function handleAddUser(id: string) {
-    setLoadingId(id);
-    await fetch("/api/business/team/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        businessId: effectiveBusinessId,
-        userId: id,
-      }),
-    });
-
-    if (effectiveBusinessId) {
-      const updatedUsers = await fetchUsersForBusiness(effectiveBusinessId);
-      setUsers(updatedUsers);
-      await fetchStaff(effectiveBusinessId);
-    }
-    setLoadingId(null);
+  function handleAddUser(id: string) {
+    if (!effectiveBusinessId) return;
+    setSelectedUserId(id);
+    setDrawerOpen(true);
   }
   async function handleRemoveUser(id: string) {
     setLoadingId(id);
@@ -84,28 +74,42 @@ export const TeamView = ({ userActiveId }: { userActiveId: string | null }) => {
     <>
       <SiteHeader title="Team" />
       <div className="flex flex-1 flex-col p-4">
-        {users.map((user) => (
-          <div key={user.id}>
-            {user.email}
-            {user.isInBusiness ? (
-              <Button
-                variant="outline"
-                onClick={() => handleRemoveUser(user.id)}
-                disabled={loadingId === user.id}
-              >
-                {loadingId === user.id ? "Removing..." : "Remove to business"}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => handleAddUser(user.id)}
-                disabled={loadingId === user.id}
-              >
-                {loadingId === user.id ? "Adding..." : "Add to Business"}
-              </Button>
-            )}
-          </div>
-        ))}
+        {users.length > 0 ? (
+          users.map((user) => (
+            <div key={user.id}>
+              {user.email}
+              {user.isInBusiness ? (
+                <Button
+                  variant="outline"
+                  onClick={() => handleRemoveUser(user.id)}
+                  disabled={loadingId === user.id}
+                >
+                  {loadingId === user.id ? "Removing..." : "Remove to business"}
+                </Button>
+              ) : (
+                <Button onClick={() => handleAddUser(user.id)}>
+                  Add to Business
+                </Button>
+              )}
+            </div>
+          ))
+        ) : (
+          <p>No users...</p>
+        )}
       </div>
+      {drawerOpen && effectiveBusinessId && selectedUserId && (
+        <AddToBusinessDrawer
+          isOpen={true}
+          onClose={() => setDrawerOpen(false)}
+          businessId={effectiveBusinessId}
+          userId={selectedUserId}
+          onAdded={async () => {
+            const updated = await fetchUsersForBusiness(effectiveBusinessId);
+            setUsers(updated);
+            await fetchStaff(effectiveBusinessId);
+          }}
+        />
+      )}
     </>
   );
 };

@@ -6,10 +6,12 @@ import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
-// Валідація вхідних даних
 const schema = z.object({
   businessId: z.string(),
   userId: z.string(),
+  workStart: z.string(),
+  workEnd: z.string(),
+  workDays: z.string().transform((val) => JSON.parse(val).map(Number)),
 });
 
 export async function POST(req: Request) {
@@ -28,8 +30,7 @@ export async function POST(req: Request) {
     return new Response("Invalid input", { status: 400 });
   }
 
-  const { businessId, userId } = result.data;
-
+  const { businessId, userId, workStart, workEnd, workDays } = result.data;
   // Чи вже доданий?
   const existing = await db.query.staffMembers.findFirst({
     where: (s) => and(eq(s.businessId, businessId), eq(s.userId, userId)),
@@ -43,6 +44,9 @@ export async function POST(req: Request) {
   await db.insert(staffMembers).values({
     businessId,
     userId,
+    workStart,
+    workEnd,
+    workDays,
     id: nanoid(),
   });
 
