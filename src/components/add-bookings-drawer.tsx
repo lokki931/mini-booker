@@ -50,6 +50,7 @@ const formSchema = z.object({
     .string()
     .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time"),
   staffId: z.string(),
+  duration: z.number().min(1, "Duration is required"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -64,6 +65,7 @@ export function AddBookingsDrawer() {
   const { bookings, setBookings } = useBookingsStore();
   const { activeBusinessId } = useBusinessStore();
   const { staff, fetchStaff, setStaff } = useStaffStore();
+  const [error, setError] = React.useState<string | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -73,6 +75,7 @@ export function AddBookingsDrawer() {
       service: "",
       bookingDate: new Date(),
       bookingTime: "",
+      duration: 30,
     },
   });
   React.useEffect(() => {
@@ -84,6 +87,7 @@ export function AddBookingsDrawer() {
   }, [activeBusinessId, fetchStaff, session, setStaff]);
 
   const onSubmit = async (values: FormData) => {
+    setError(null);
     const {
       bookingDate,
       bookingTime,
@@ -91,6 +95,7 @@ export function AddBookingsDrawer() {
       clientPhone,
       service,
       staffId,
+      duration,
     } = values;
 
     const [hours, minutes] = bookingTime.split(":").map(Number);
@@ -108,6 +113,7 @@ export function AddBookingsDrawer() {
         staffId,
         bookingDate: fullDate.toISOString(),
         businessId: activeBusinessId,
+        duration,
       }),
     });
     const data = await res.json();
@@ -119,7 +125,7 @@ export function AddBookingsDrawer() {
       form.reset(); // очистка форми
       close(); // закриття drawer
     } else {
-      console.error("Failed to add booking");
+      setError(data.error || "Failed to add booking");
     }
   };
   function invateLink() {
@@ -152,7 +158,19 @@ export function AddBookingsDrawer() {
                   </FormItem>
                 )}
               />
-
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration (minutes)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min={1} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="bookingTime"
@@ -239,7 +257,7 @@ export function AddBookingsDrawer() {
                   </FormItem>
                 )}
               />
-
+              {error && <div className="text-red-600 mb-4">{error}</div>}
               <DrawerFooter className="px-0 pt-0 pb-7">
                 <Button type="submit" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? "Adding..." : "Add"}

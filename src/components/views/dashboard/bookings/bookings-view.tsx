@@ -41,6 +41,13 @@ export const BookingsView = () => {
           bookings.map((b) => (
             <div key={b.id}>
               {b.clientName} — {b.service}
+              <div>
+                {new Date(b.bookingDate).toLocaleDateString()} at{" "}
+                {new Date(b.bookingDate).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
             </div>
           ))
         ) : (
