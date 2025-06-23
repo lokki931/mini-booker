@@ -7,6 +7,7 @@ import {
   varchar,
   time,
   jsonb,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const userRole = pgEnum("user_role", ["admin", "staff"]);
@@ -83,6 +84,7 @@ export const bookings = pgTable("bookings", {
   clientPhone: varchar("client_phone", { length: 50 }).notNull(),
   service: varchar("service", { length: 256 }).notNull(),
   bookingDate: timestamp("booking_date").notNull(),
+  duration: integer("duration").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export const staffMembers = pgTable("staff_members", {

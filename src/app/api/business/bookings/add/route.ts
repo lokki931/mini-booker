@@ -1,11 +1,10 @@
-// POST /api/bookings/add
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { bookings } from "@/schema";
 import { nanoid } from "nanoid";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { and, eq, lt, gte } from "drizzle-orm";
+import { and, eq, gte, lt } from "drizzle-orm";
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({
@@ -40,28 +39,42 @@ export async function POST(req: Request) {
   }
 
   const bookingStart = new Date(bookingDate);
-  const bookingEnd = new Date(bookingStart);
-  bookingEnd.setMinutes(bookingStart.getMinutes() + duration);
+  const bookingEnd = new Date(bookingStart.getTime() + duration * 60 * 1000);
 
   // Перевірка перетину з існуючими бронюваннями
-  const overlapping = await db.query.bookings.findFirst({
+  const existingBookings = await db.query.bookings.findMany({
     where: (b) =>
       and(
         eq(b.staffId, staffId),
         eq(b.businessId, businessId),
-        lt(b.bookingDate, bookingEnd),
-        gte(b.bookingDate, bookingStart)
+        gte(
+          b.bookingDate,
+          new Date(bookingStart.getTime() - 1000 * 60 * 60 * 12)
+        ),
+        lt(
+          b.bookingDate,
+          new Date(bookingStart.getTime() + 1000 * 60 * 60 * 12)
+        )
       ),
   });
 
-  if (overlapping) {
+  const isOverlapping = existingBookings.some((booking) => {
+    const existingStart = new Date(booking.bookingDate);
+    const existingEnd = new Date(
+      existingStart.getTime() + booking.duration * 60 * 1000
+    );
+
+    return bookingStart < existingEnd && bookingEnd > existingStart;
+  });
+
+  if (isOverlapping) {
     return NextResponse.json(
       { error: "Time slot is already booked" },
       { status: 409 }
     );
   }
 
-  // Перевірка чи час у робочих годинах
+  // Перевірка робочих годин
   const staff = await db.query.staffMembers.findFirst({
     where: (s) => and(eq(s.businessId, businessId), eq(s.userId, staffId)),
   });
@@ -73,7 +86,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const dayOfWeek = bookingStart.getDay(); // 0 - Sunday ... 6 - Saturday
+  const dayOfWeek = bookingStart.getDay(); // 0 - Sunday, 1 - Monday, ...
   const startTimeStr = `${bookingStart
     .getHours()
     .toString()
@@ -105,6 +118,7 @@ export async function POST(req: Request) {
     );
   }
 
+  // Створення нового бронювання
   const [newBookings] = await db
     .insert(bookings)
     .values({
@@ -113,6 +127,7 @@ export async function POST(req: Request) {
       clientPhone,
       service,
       bookingDate: bookingStart,
+      duration, // додано!
       businessId,
       staffId,
     })
