@@ -9,6 +9,7 @@ export type Bookings = {
   bookingDate: Date;
   businessId: string;
   staffId: string;
+  duration: number;
 };
 
 type BookingsStore = {

@@ -7,10 +7,11 @@ import { useBookingsStore } from "@/stores/bookings";
 import { useBusinessStore } from "@/stores/business";
 import { Button } from "@/components/ui/button";
 import { AddBookingsDrawer } from "@/components/add-bookings-drawer";
+import { BookingCalendar } from "@/components/booking-calendar";
 
 export const BookingsView = () => {
   const { activeBusinessId } = useBusinessStore();
-  const { bookings, setBookings } = useBookingsStore();
+  const { setBookings, bookings } = useBookingsStore();
   const openDrawer = useAddBookingsStore((s) => s.open);
 
   React.useEffect(() => {
@@ -37,19 +38,8 @@ export const BookingsView = () => {
         <Button onClick={openDrawer} className="mb-4 w-fit">
           + Add Booking
         </Button>
-        {bookings?.length ? (
-          bookings.map((b) => (
-            <div key={b.id}>
-              {b.clientName} — {b.service}
-              <div>
-                {new Date(b.bookingDate).toLocaleDateString()} at{" "}
-                {new Date(b.bookingDate).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </div>
-            </div>
-          ))
+        {bookings && bookings.length > 0 ? (
+          <BookingCalendar bookings={bookings} />
         ) : (
           <div className="text-muted-foreground">No Bookings</div>
         )}
