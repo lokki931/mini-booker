@@ -122,8 +122,8 @@ export function AddBookingsDrawer() {
         router.push("/dashboard/bookings");
       }
       setBookings([...(bookings ?? []), data.newBookings]);
-      form.reset(); // очистка форми
-      close(); // закриття drawer
+      form.reset();
+      close();
     } else {
       setError(data.error || "Failed to add booking");
     }
@@ -253,9 +253,12 @@ export function AddBookingsDrawer() {
                     {session?.user.role === "admin" && (
                       <span>
                         no user -{" "}
-                        <Button onClick={invateLink} variant="secondary">
+                        <b
+                          className="cursor-pointer hover:underline"
+                          onClick={invateLink}
+                        >
                           invite
-                        </Button>
+                        </b>
                       </span>
                     )}
                     <FormMessage />
