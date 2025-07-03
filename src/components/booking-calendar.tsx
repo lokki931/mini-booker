@@ -77,7 +77,7 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
   }, [bookings]);
 
   return (
-    <div className="h-[80vh] p-4 bg-white dark:bg-zinc-900 rounded-xl shadow">
+    <div className="h-[700px] p-4 bg-white dark:bg-zinc-900 rounded-xl shadow">
       <Calendar
         localizer={localizer}
         events={events}
@@ -89,7 +89,7 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
         onView={handleViewChange}
         views={["month", "week", "day", "agenda"]}
         defaultDate={new Date()}
-        style={{ height: 500 }}
+        style={{ height: 700 }}
         onSelectEvent={(event) => setSelectedEvent(event)}
       />
       <BookingDrawer

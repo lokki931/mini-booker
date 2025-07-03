@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAddBusinessStore } from "@/stores/add-business";
 import { useBusinessStore } from "@/stores/business";
+import { useStatsStore } from "@/stores/stats";
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -34,6 +35,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function AddBusinessDrawer() {
+  const { fetchStats } = useStatsStore();
   const { isOpen, close } = useAddBusinessStore();
   const { businesses, setBusinesses, setActiveBusiness } = useBusinessStore();
 
@@ -61,6 +63,7 @@ export function AddBusinessDrawer() {
       setBusinesses([...(businesses ?? []), business]);
       setTimeout(() => {
         setActiveBusiness(businessId);
+        fetchStats();
       }, 0);
       form.reset();
       close();
