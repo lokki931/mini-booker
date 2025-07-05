@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CalendarEvent } from "./booking-calendar";
+import { client } from "@/lib/auth-client";
+import { ExtendedSession } from "@/lib/types";
+import { RemoveBooking } from "./remove-booking";
 
 type BookingDrawerProps = {
   selectedEvent: CalendarEvent | null;
@@ -19,7 +22,11 @@ export const BookingDrawer = ({
   selectedEvent,
   setSelectedEvent,
 }: BookingDrawerProps) => {
+  const { data: session } = client.useSession() as {
+    data: ExtendedSession | null;
+  };
   const [staffName, setStaffName] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     if (!selectedEvent?.staffId) return;
 
@@ -59,7 +66,15 @@ export const BookingDrawer = ({
           </div>
 
           <DrawerFooter>
-            <Button onClick={() => setSelectedEvent(null)}>Закрити</Button>
+            <Button onClick={() => setSelectedEvent(null)}>Close</Button>
+            {session?.user.role === "admin" && (
+              <RemoveBooking
+                setSelectedEvent={setSelectedEvent}
+                selectedEvent={selectedEvent}
+              >
+                Cancel
+              </RemoveBooking>
+            )}
           </DrawerFooter>
         </div>
       </DrawerContent>
