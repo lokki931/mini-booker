@@ -16,11 +16,13 @@ import { RemoveBooking } from "./remove-booking";
 type BookingDrawerProps = {
   selectedEvent: CalendarEvent | null;
   setSelectedEvent: React.Dispatch<React.SetStateAction<CalendarEvent | null>>;
+  setUpdatedEvent: React.Dispatch<React.SetStateAction<CalendarEvent | null>>;
 };
 
 export const BookingDrawer = ({
   selectedEvent,
   setSelectedEvent,
+  setUpdatedEvent,
 }: BookingDrawerProps) => {
   const { data: session } = client.useSession() as {
     data: ExtendedSession | null;
@@ -66,15 +68,27 @@ export const BookingDrawer = ({
           </div>
 
           <DrawerFooter>
-            <Button onClick={() => setSelectedEvent(null)}>Close</Button>
             {session?.user.role === "admin" && (
-              <RemoveBooking
-                setSelectedEvent={setSelectedEvent}
-                selectedEvent={selectedEvent}
-              >
-                Cancel
-              </RemoveBooking>
+              <>
+                <Button
+                  onClick={() => {
+                    setSelectedEvent(null);
+                    setUpdatedEvent(selectedEvent);
+                  }}
+                >
+                  Update
+                </Button>
+                <RemoveBooking
+                  setSelectedEvent={setSelectedEvent}
+                  selectedEvent={selectedEvent}
+                >
+                  Cancel
+                </RemoveBooking>
+              </>
             )}
+            <Button variant="secondary" onClick={() => setSelectedEvent(null)}>
+              Close
+            </Button>
           </DrawerFooter>
         </div>
       </DrawerContent>

@@ -10,6 +10,7 @@ import { enUS } from "date-fns/locale";
 import { Bookings } from "@/stores/bookings";
 
 import { BookingDrawer } from "./booking-drawer";
+import { UpdateBookingsDrawer } from "./update-bookings-drawer";
 
 const locales = { "en-US": enUS };
 
@@ -42,6 +43,9 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
   const [events, setEvents] = React.useState<CalendarEvent[] | []>([]);
   const [selectedEvent, setSelectedEvent] =
     React.useState<CalendarEvent | null>(null);
+  const [updatedEvent, setUpdatedEvent] = React.useState<CalendarEvent | null>(
+    null
+  );
   const [view, setView] = React.useState<View>("week");
   const [date, setDate] = React.useState(new Date());
 
@@ -95,6 +99,11 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
       <BookingDrawer
         selectedEvent={selectedEvent}
         setSelectedEvent={setSelectedEvent}
+        setUpdatedEvent={setUpdatedEvent}
+      />
+      <UpdateBookingsDrawer
+        updatedEvent={updatedEvent}
+        setUpdatedEvent={setUpdatedEvent}
       />
     </div>
   );
