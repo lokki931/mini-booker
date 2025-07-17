@@ -37,7 +37,7 @@ export const DashboardViewAdmin = ({ user }: Props) => {
         )}
         {!activeBusiness && (
           <p className="mb-2 text-sm text-muted-foreground">
-            You `&apos;` choose active business.
+            You don&apos;t choose active business.
           </p>
         )}
         {!stats ? (
