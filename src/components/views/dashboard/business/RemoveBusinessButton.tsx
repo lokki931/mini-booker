@@ -44,8 +44,7 @@ export function RemoveBusinessButton({ businessId }: { businessId: string }) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm">
-          <Trash2 className="mr-2 size-4" />
-          Delete
+          <Trash2 className="size-4" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
