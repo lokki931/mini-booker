@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MiniBooker
 
-## Getting Started
+**MiniBooker** is a SaaS platform for small businesses to manage bookings, staff, and working hours. Perfect for beauty salons, coffee shops, service centers, and any business that needs a simple, modern tool for online appointment scheduling.
 
-First, run the development server:
+## 🔧 Tech Stack
+
+- **Next.js (App Router)** — React framework with SSR support
+- **TypeScript** — Static typing for better developer experience
+- **Tailwind CSS + ShadCN UI** — Modern styling and UI components
+- **PostgreSQL (via Neon)** — Scalable relational database
+- **Drizzle ORM** — Type-safe ORM for working with the database
+- **BetterAuth** — Custom authentication (Google and Email/Password)
+- **Zustand** — Lightweight global state management
+- **React Hook Form + Zod** — Form management with validation
+
+## ⚙️ Features
+
+- 👥 User authentication (Google / Email)
+- 🧾 Admin-only business creation
+- 🧑‍🤝‍🧑 Add and manage staff for each business
+- ⏰ Define working hours per staff member
+- 📅 Create bookings with conflict checking and availability
+- 📈 Admin dashboard to manage teams and businesses
+- 🔍 Search and pagination for users and bookings
+
+## 🚀 Getting Started Locally
+
+> Make sure you have **Node.js** and **PostgreSQL** (or [Neon](https://neon.tech)) set up.
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/your-username/minibooker.git
+cd minibooker
+```
+
+2. Install dependencies
+
+```bash
+npm install
+```
+
+3. Configure environment variables
+
+```bash
+DATABASE_URL=postgresql://your_database_url
+AUTH_GOOGLE_ID=your_google_client_id
+AUTH_GOOGLE_SECRET=your_google_client_secret
+```
+
+4. Run migrations
+
+```bash
+npm drizzle-kit push
+```
+
+4. Run project
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
