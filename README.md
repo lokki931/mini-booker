@@ -30,7 +30,7 @@
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/your-username/minibooker.git
+git clone https://github.com/lokki931/mini-booker.git
 cd minibooker
 ```
 
@@ -44,8 +44,10 @@ npm install
 
 ```bash
 DATABASE_URL=postgresql://your_database_url
-AUTH_GOOGLE_ID=your_google_client_id
-AUTH_GOOGLE_SECRET=your_google_client_secret
+BETTER_AUTH_SECRET=your_auth_secret
+BETTER_AUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
 4. Run migrations
