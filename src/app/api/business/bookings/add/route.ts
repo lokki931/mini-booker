@@ -7,9 +7,19 @@ import { NextResponse } from "next/server";
 import { and, eq, gte, lt } from "drizzle-orm";
 import { z } from "zod";
 
+import { Resend } from "resend";
+import * as React from "react";
+import EmailTemplate from "@/components/email-template";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const schema = z.object({
   clientName: z.string(),
   clientPhone: z.string(),
+  clientEmail: z
+    .string()
+    .min(1, { message: "This field has to be filled." })
+    .email("This is not a valid email."),
   service: z.string(),
   bookingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid date format",
@@ -41,6 +51,7 @@ export async function POST(req: Request) {
     bookingDate,
     businessId,
     staffId,
+    clientEmail,
     duration, // в хвилинах
   } = body;
   // Обчислення часу початку та завершення бронювання
@@ -146,6 +157,24 @@ export async function POST(req: Request) {
       staffId,
     })
     .returning();
+  try {
+    const { error } = await resend.emails.send({
+      from: "MiniBooker <onboarding@resend.dev>",
+      to: [clientEmail],
+      subject: `New Booking ${clientName}`,
+      react: EmailTemplate({
+        firstName: clientName,
+        serviceName: service,
+        bookingDate: bookingStart.toISOString(),
+      }) as React.ReactElement,
+    });
+
+    if (error) {
+      console.error(error);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 
   return NextResponse.json({ newBookings });
 }

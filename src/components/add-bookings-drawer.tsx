@@ -42,6 +42,10 @@ import { useStaffStore } from "@/stores/staff";
 const formSchema = z.object({
   clientName: z.string().min(2),
   clientPhone: z.string().min(5),
+  clientEmail: z
+    .string()
+    .min(1, { message: "This field has to be filled." })
+    .email("This is not a valid email."),
   service: z.string().min(2),
   bookingDate: z.date({
     required_error: "Date is required",
@@ -71,6 +75,7 @@ export function AddBookingsDrawer() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       clientName: "",
+      clientEmail: "",
       clientPhone: "",
       service: "",
       bookingDate: new Date(),
@@ -96,6 +101,7 @@ export function AddBookingsDrawer() {
       service,
       staffId,
       duration,
+      clientEmail,
     } = values;
 
     const [hours, minutes] = bookingTime.split(":").map(Number);
@@ -114,6 +120,7 @@ export function AddBookingsDrawer() {
         bookingDate: fullDate.toISOString(),
         businessId: activeBusinessId,
         duration,
+        clientEmail,
       }),
     });
     const data = await res.json();
@@ -211,6 +218,19 @@ export function AddBookingsDrawer() {
                     <FormLabel>Client Phone</FormLabel>
                     <FormControl>
                       <Input placeholder="Client Phone" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="clientEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Client Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Client Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
