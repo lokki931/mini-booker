@@ -20,14 +20,6 @@ type Props = {
 export const DashboardViewAdmin = ({ user }: Props) => {
   const { stats, fetchStats } = useStatsStore();
   const { activeBusinessId, businesses } = useBusinessStore();
-  async function sendEmail() {
-    await fetch("/api/test-email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
   React.useEffect(() => {
     fetchStats();
   }, [fetchStats]);
@@ -39,9 +31,7 @@ export const DashboardViewAdmin = ({ user }: Props) => {
     <>
       <SiteHeader title="Dashboard" />
       <div className="flex flex-1 flex-col p-4">
-        <h2 className="text-base font-medium mb-2">
-          Welcome {user.name} <button onClick={sendEmail}>send</button>
-        </h2>
+        <h2 className="text-base font-medium mb-2">Welcome {user.name}</h2>
         {activeBusiness && (
           <p className="mb-2">Your active business: {activeBusiness.name}</p>
         )}
