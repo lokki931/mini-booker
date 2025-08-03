@@ -10,6 +10,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import * as React from "react";
 import EmailTemplate from "@/components/email-template";
+import EmailTemplateUser from "@/components/email-template -user";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -157,8 +158,18 @@ export async function POST(req: Request) {
       staffId,
     })
     .returning();
+  const user = await db.query.user.findFirst({
+    where: (u) => eq(u.id, staff.userId),
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const staffEmail = user.email;
+  const staffName = user.name;
   try {
-    const { error } = await resend.emails.send({
+    await resend.emails.send({
       from: "MiniBooker <onboarding@resend.dev>",
       to: [clientEmail],
       subject: `New Booking ${clientName}`,
@@ -168,10 +179,16 @@ export async function POST(req: Request) {
         bookingDate: bookingStart.toISOString(),
       }) as React.ReactElement,
     });
-
-    if (error) {
-      console.error(error);
-    }
+    await resend.emails.send({
+      from: "MiniBooker <onboarding@resend.dev>",
+      to: [staffEmail],
+      subject: `New Booking Received`,
+      react: EmailTemplateUser({
+        firstName: staffName,
+        serviceName: service,
+        bookingDate: bookingStart.toISOString(),
+      }) as React.ReactElement,
+    });
   } catch (error) {
     console.error(error);
   }
