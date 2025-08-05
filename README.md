@@ -12,6 +12,7 @@
 - **BetterAuth** — Custom authentication (Google and Email/Password)
 - **Zustand** — Lightweight global state management
 - **React Hook Form + Zod** — Form management with validation
+- **Resend** — Send email notification
 
 ## ⚙️ Features
 
@@ -49,6 +50,7 @@ BETTER_AUTH_SECRET=your_auth_secret
 BETTER_AUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+RESEND_API_KEY=your_resend_api_key
 ```
 
 4. Run migrations
