@@ -32,6 +32,7 @@ export type CalendarEvent = {
   end: Date;
   clientName: string;
   clientPhone: string;
+  clientEmail: string;
   service: string;
   bookingDate: Date;
   businessId: string;
@@ -69,6 +70,8 @@ export function BookingCalendar({ bookings }: BookingCalendarProps) {
         end,
         clientName: b.clientName,
         clientPhone: b.clientPhone,
+        clientEmail: b.clientEmail,
+
         service: b.service,
         bookingDate: new Date(b.bookingDate),
         businessId: b.businessId,

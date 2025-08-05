@@ -42,6 +42,10 @@ const formSchema = z.object({
   clientName: z.string().min(2),
   clientPhone: z.string().min(5),
   service: z.string().min(2),
+  clientEmail: z
+    .string()
+    .min(1, { message: "This field has to be filled." })
+    .email("This is not a valid email."),
   bookingDate: z.date({
     required_error: "Date is required",
   }),
@@ -76,6 +80,7 @@ export function UpdateBookingsDrawer({
     defaultValues: {
       clientName: "",
       clientPhone: "",
+      clientEmail: "",
       service: "",
       bookingDate: new Date(),
       bookingTime: "",
@@ -94,6 +99,7 @@ export function UpdateBookingsDrawer({
       form.reset({
         clientName: updatedEvent.clientName,
         clientPhone: updatedEvent.clientPhone,
+        clientEmail: updatedEvent.clientEmail,
         service: updatedEvent.service,
         bookingDate: new Date(updatedEvent.bookingDate),
         bookingTime: (() => {
@@ -125,6 +131,7 @@ export function UpdateBookingsDrawer({
         body: JSON.stringify({
           clientName: values.clientName,
           clientPhone: values.clientPhone,
+          clientEmail: values.clientEmail,
           service: values.service,
           bookingDate: fullDate.toISOString(),
           bookingTime: values.bookingTime,
@@ -226,6 +233,19 @@ export function UpdateBookingsDrawer({
                     <FormLabel>Client Phone</FormLabel>
                     <FormControl>
                       <Input placeholder="Client Phone" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="clientEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Client Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Client Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

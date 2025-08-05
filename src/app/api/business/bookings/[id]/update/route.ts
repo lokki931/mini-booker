@@ -6,9 +6,20 @@ import { NextResponse } from "next/server";
 import { and, eq, gte, lt, ne } from "drizzle-orm";
 import { z } from "zod";
 
+import { Resend } from "resend";
+import * as React from "react";
+import EmailTemplate from "@/components/email-template";
+import EmailTemplateUser from "@/components/email-template -user";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const schema = z.object({
   clientName: z.string(),
   clientPhone: z.string(),
+  clientEmail: z
+    .string()
+    .min(1, { message: "This field has to be filled." })
+    .email("This is not a valid email."),
   service: z.string(),
   bookingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid date format",
@@ -50,6 +61,7 @@ export async function PUT(
     businessId,
     staffId,
     duration,
+    clientEmail,
   } = body;
 
   const bookingStart = new Date(bookingDate);
@@ -67,6 +79,26 @@ export async function PUT(
     bookingStart.getTime() !==
       new Date(existingBooking.bookingDate).getTime() ||
     duration !== existingBooking.duration;
+  const staff = await db.query.staffMembers.findFirst({
+    where: (s) => and(eq(s.businessId, businessId), eq(s.userId, staffId)),
+  });
+
+  if (!staff) {
+    return NextResponse.json(
+      { error: "Staff member not found" },
+      { status: 404 }
+    );
+  }
+  const user = await db.query.user.findFirst({
+    where: (u) => eq(u.id, staff.userId),
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const staffEmail = user.email;
+  const staffName = user.name;
 
   if (isDateChanged) {
     const now = new Date();
@@ -109,17 +141,6 @@ export async function PUT(
       );
     }
 
-    const staff = await db.query.staffMembers.findFirst({
-      where: (s) => and(eq(s.businessId, businessId), eq(s.userId, staffId)),
-    });
-
-    if (!staff) {
-      return NextResponse.json(
-        { error: "Staff member not found" },
-        { status: 404 }
-      );
-    }
-
     const dayOfWeek = bookingStart.getDay();
     const startTimeStr = `${bookingStart
       .getHours()
@@ -155,12 +176,19 @@ export async function PUT(
       );
     }
   }
-
+  const isUpdated =
+    existingBooking.clientName !== clientName ||
+    existingBooking.clientPhone !== clientPhone ||
+    existingBooking.service !== service ||
+    existingBooking.duration !== duration ||
+    existingBooking.staffId !== staffId ||
+    new Date(existingBooking.bookingDate).getTime() !== bookingStart.getTime();
   await db
     .update(bookings)
     .set({
       clientName,
       clientPhone,
+      clientEmail,
       service,
       bookingDate: bookingStart,
       duration,
@@ -173,6 +201,32 @@ export async function PUT(
     .select()
     .from(bookings)
     .where(eq(bookings.id, bookingId));
+  if (isUpdated) {
+    try {
+      await resend.emails.send({
+        from: "MiniBooker <onboarding@resend.dev>",
+        to: [clientEmail],
+        subject: `Update Booking ${clientName}`,
+        react: EmailTemplate({
+          firstName: clientName,
+          serviceName: service,
+          bookingDate: bookingStart.toISOString(),
+        }) as React.ReactElement,
+      });
+      await resend.emails.send({
+        from: "MiniBooker <onboarding@resend.dev>",
+        to: [staffEmail],
+        subject: `Update Booking Received`,
+        react: EmailTemplateUser({
+          firstName: staffName,
+          serviceName: service,
+          bookingDate: bookingStart.toISOString(),
+        }) as React.ReactElement,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return NextResponse.json({ updated });
 }

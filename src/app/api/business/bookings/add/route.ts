@@ -151,6 +151,7 @@ export async function POST(req: Request) {
       id: nanoid(),
       clientName,
       clientPhone,
+      clientEmail,
       service,
       bookingDate: bookingStart,
       duration,

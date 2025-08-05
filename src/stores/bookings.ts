@@ -5,6 +5,7 @@ export type Bookings = {
   id: string;
   clientName: string;
   clientPhone: string;
+  clientEmail: string;
   service: string;
   bookingDate: Date;
   businessId: string;

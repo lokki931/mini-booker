@@ -60,6 +60,9 @@ export const BookingDrawer = ({
               <strong>Phone:</strong> {selectedEvent?.clientPhone}
             </p>
             <p>
+              <strong>Email:</strong> {selectedEvent?.clientEmail}
+            </p>
+            <p>
               <strong>Duration:</strong> {selectedEvent?.duration} хв
             </p>
             <p>

@@ -82,6 +82,7 @@ export const bookings = pgTable("bookings", {
   staffId: text("staff_id").references(() => user.id),
   clientName: varchar("client_name", { length: 256 }).notNull(),
   clientPhone: varchar("client_phone", { length: 50 }).notNull(),
+  clientEmail: varchar("client_email", { length: 256 }).notNull(),
   service: varchar("service", { length: 256 }).notNull(),
   bookingDate: timestamp("booking_date").notNull(),
   duration: integer("duration").notNull(),

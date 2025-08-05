@@ -22,6 +22,7 @@
 - 📅 Create bookings with conflict checking and availability
 - 📈 Admin dashboard to manage teams and businesses
 - 🔍 Search and pagination for users and bookings
+- ✉️ Email Notifications
 
 ## 🚀 Getting Started Locally
 
