@@ -107,7 +107,9 @@ export function NavUser() {
                 <CreditCardIcon />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/dashboard/notifications")}
+              >
                 <BellIcon />
                 Notifications
               </DropdownMenuItem>

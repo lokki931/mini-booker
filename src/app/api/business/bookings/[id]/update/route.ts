@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { bookings } from "@/schema";
+import { bookings, notifications } from "@/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { and, eq, gte, lt, ne } from "drizzle-orm";
@@ -9,7 +9,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import * as React from "react";
 import EmailTemplate from "@/components/email-template";
-import EmailTemplateUser from "@/components/email-template -user";
+import EmailTemplateUser from "@/components/email-template-user";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -201,6 +201,7 @@ export async function PUT(
     .select()
     .from(bookings)
     .where(eq(bookings.id, bookingId));
+
   if (isUpdated) {
     try {
       await resend.emails.send({
@@ -222,6 +223,11 @@ export async function PUT(
           serviceName: service,
           bookingDate: bookingStart.toISOString(),
         }) as React.ReactElement,
+      });
+      await db.insert(notifications).values({
+        businessId,
+        type: "booking_update",
+        message: `Booking for ${clientName} was updated on ${bookingStart.toLocaleString()}`,
       });
     } catch (error) {
       console.error(error);

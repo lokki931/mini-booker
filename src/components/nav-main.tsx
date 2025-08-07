@@ -1,6 +1,6 @@
 "use client";
 
-import { MailIcon, PlusCircleIcon, type LucideIcon } from "lucide-react";
+import { BellIcon, PlusCircleIcon, type LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -45,9 +45,10 @@ export function NavMain({
               size="icon"
               className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
               variant="outline"
+              onClick={() => handleLink("/dashboard/notifications")}
             >
-              <MailIcon />
-              <span className="sr-only">Inbox</span>
+              <BellIcon />
+              <span className="sr-only">Notifications</span>
             </Button>
           </SidebarMenuItem>
         </SidebarMenu>

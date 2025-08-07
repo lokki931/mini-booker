@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { bookings } from "@/schema";
+import { bookings, notifications } from "@/schema";
 import { nanoid } from "nanoid";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -10,7 +10,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import * as React from "react";
 import EmailTemplate from "@/components/email-template";
-import EmailTemplateUser from "@/components/email-template -user";
+import EmailTemplateUser from "@/components/email-template-user";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -159,6 +159,11 @@ export async function POST(req: Request) {
       staffId,
     })
     .returning();
+  await db.insert(notifications).values({
+    businessId,
+    type: "booking_create",
+    message: `Booking for ${clientName} was created on ${bookingStart.toLocaleString()}`,
+  });
   const user = await db.query.user.findFirst({
     where: (u) => eq(u.id, staff.userId),
   });

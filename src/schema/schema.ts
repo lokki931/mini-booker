@@ -8,6 +8,7 @@ import {
   time,
   jsonb,
   integer,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const userRole = pgEnum("user_role", ["admin", "staff"]);
@@ -99,4 +100,13 @@ export const staffMembers = pgTable("staff_members", {
   workStart: time("work_start"),
   workEnd: time("work_end"),
   workDays: jsonb("work_days"),
+});
+
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  businessId: text("business_id").notNull(),
+  type: text("type").notNull(), // e.g., "booking_updated"
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  isRead: boolean("is_read").default(false).notNull(),
 });
