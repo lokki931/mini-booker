@@ -38,6 +38,7 @@ import { ExtendedSession } from "@/lib/types";
 import { usePathname, useRouter } from "next/navigation";
 import { DatePickerNew } from "./ui/date-picker-new";
 import { useStaffStore } from "@/stores/staff";
+import { useNotificationsStore } from "@/stores/notifications";
 
 const formSchema = z.object({
   clientName: z.string().min(2),
@@ -60,6 +61,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function AddBookingsDrawer() {
+  const { fetchNoReadNotifications } = useNotificationsStore();
   const router = useRouter();
   const pathName = usePathname();
   const { data: session } = client.useSession() as {
@@ -129,6 +131,9 @@ export function AddBookingsDrawer() {
         router.push("/dashboard/bookings");
       }
       setBookings([...(bookings ?? []), data.newBookings]);
+      if (activeBusinessId) {
+        await fetchNoReadNotifications(activeBusinessId);
+      }
       form.reset();
       close();
     } else {

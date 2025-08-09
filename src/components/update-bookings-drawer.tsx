@@ -37,6 +37,7 @@ import { ExtendedSession } from "@/lib/types";
 import { DatePickerNew } from "./ui/date-picker-new";
 import { useStaffStore } from "@/stores/staff";
 import { CalendarEvent } from "./booking-calendar";
+import { useNotificationsStore } from "@/stores/notifications";
 
 const formSchema = z.object({
   clientName: z.string().min(2),
@@ -70,6 +71,7 @@ export function UpdateBookingsDrawer({
   const { data: session } = client.useSession() as {
     data: ExtendedSession | null;
   };
+  const { fetchNoReadNotifications } = useNotificationsStore();
   const { setBookings, bookings } = useBookingsStore();
   const { activeBusinessId } = useBusinessStore();
   const { staff, fetchStaff, setStaff } = useStaffStore();
@@ -149,6 +151,10 @@ export function UpdateBookingsDrawer({
           b.id === data.updated.id ? data.updated : b
         )
       );
+      if (activeBusinessId) {
+        await fetchNoReadNotifications(activeBusinessId);
+      }
+
       setUpdatedEvent(null);
     } else {
       setError(data.error || "Failed to update booking");

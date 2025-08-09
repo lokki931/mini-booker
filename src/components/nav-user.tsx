@@ -107,12 +107,14 @@ export function NavUser() {
                 <CreditCardIcon />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push("/dashboard/notifications")}
-              >
-                <BellIcon />
-                Notifications
-              </DropdownMenuItem>
+              {session.user.role === "admin" && (
+                <DropdownMenuItem
+                  onClick={() => router.push("/dashboard/notifications")}
+                >
+                  <BellIcon />
+                  Notifications
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
