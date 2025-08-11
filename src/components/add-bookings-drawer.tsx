@@ -131,7 +131,7 @@ export function AddBookingsDrawer() {
         router.push("/dashboard/bookings");
       }
       setBookings([...(bookings ?? []), data.newBookings]);
-      if (activeBusinessId) {
+      if (activeBusinessId && session?.user.role === "admin") {
         await fetchNoReadNotifications(activeBusinessId);
       }
       form.reset();

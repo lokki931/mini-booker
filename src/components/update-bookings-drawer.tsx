@@ -151,7 +151,7 @@ export function UpdateBookingsDrawer({
           b.id === data.updated.id ? data.updated : b
         )
       );
-      if (activeBusinessId) {
+      if (activeBusinessId && session?.user.role === "admin") {
         await fetchNoReadNotifications(activeBusinessId);
       }
 
